@@ -1,0 +1,127 @@
+[
+    {
+        "description": "Администрация просит вас провести дополнительное занятие.",
+        "actions": [
+            {
+                "description": "Согласиться",
+                "effects": {
+                    "administration": 2,
+                    "colleagues": 0,
+                    "parents": 0,
+                    "students": 1,
+                    "freeTime": -2
+                }
+            },
+            {
+                "description": "Отказать",
+                "effects": {
+                    "administration": -2,
+                    "colleagues": 0,
+                    "parents": 0,
+                    "students": -1,
+                    "freeTime": 1
+                }
+            }
+        ]
+    },
+    {
+        "description": "Коллега просит помочь с проектом.",
+        "actions": [
+            {
+                "description": "Помочь",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 2,
+                    "parents": 0,
+                    "students": 0,
+                    "freeTime": -2
+                }
+            },
+            {
+                "description": "Отказать",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": -2,
+                    "parents": 0,
+                    "students": 0,
+                    "freeTime": 1
+                }
+            }
+        ]
+    },
+    {
+        "description": "Родители ученика просят провести индивидуальную консультацию.",
+        "actions": [
+            {
+                "description": "Согласиться",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 0,
+                    "parents": 2,
+                    "students": 1,
+                    "freeTime": -2
+                }
+            },
+            {
+                "description": "Отказать",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 0,
+                    "parents": -2,
+                    "students": -1,
+                    "freeTime": 1
+                }
+            }
+        ]
+    },
+    {
+        "description": "Ученик просит дополнительное занятие.",
+        "actions": [
+            {
+                "description": "Согласиться",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 0,
+                    "parents": 0,
+                    "students": 2,
+                    "freeTime": -2
+                }
+            },
+            {
+                "description": "Отказать",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 0,
+                    "parents": 0,
+                    "students": -2,
+                    "freeTime": 1
+                }
+            }
+        ]
+    },
+    {
+        "description": "Вам предложили провести внеклассное мероприятие.",
+        "actions": [
+            {
+                "description": "Согласиться",
+                "effects": {
+                    "administration": 1,
+                    "colleagues": 1,
+                    "parents": 1,
+                    "students": 1,
+                    "freeTime": -3
+                }
+            },
+            {
+                "description": "Отказать",
+                "effects": {
+                    "administration": -1,
+                    "colleagues": -1,
+                    "parents": -1,
+                    "students": -1,
+                    "freeTime": 2
+                }
+            }
+        ]
+    }
+]
