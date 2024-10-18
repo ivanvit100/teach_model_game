@@ -1,9 +1,29 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { Situation, Action, FixedEvent } from './types';
+
+	type Action = {
+        description: string;
+        effects: {
+            administration: number;
+            colleagues: number;
+            parents: number;
+            students: number;
+            freeTime: number;
+        };
+    };
+    type Situation = {
+        description: string;
+        actions: Action[];
+    };
+    type FixedEvent = {
+        interval: number;
+        description: string;
+        actions: Action[];
+    };
 	
 	let situations: Situation[] = [];
 	let fixedEvents: FixedEvent[] = [];
+	let score: number = 0;
 	
 	const parameters = [
 		{ label: 'Администрация', id: 'administration', value: 10, message: 'Вы уволены!', warn: "Вы на грани увольнения!" },
@@ -12,8 +32,6 @@
 		{ label: 'Ученики', id: 'students', value: 10, message: 'Ученики устроили бунт.', warn: "Ученики жалуются на Вас." },
 		{ label: 'Свободное время', id: 'freeTime', value: 10, message: 'Вы выгорели.', warn: "Вы перерабатываете." }
 	];
-	
-	let score: number = 0;
 	
 	function getRandomSituation(): Situation {
 		const index = Math.floor(Math.random() * situations.length);
@@ -103,10 +121,10 @@
 	}
 	
 	onMount(async () => {
-		const situationsResponse = await fetch('/public/situations.json');
+		const situationsResponse = await fetch('/situations.json');
 		situations = await situationsResponse.json();
 		
-		const fixedEventsResponse = await fetch('/public/fixedEvents.json');
+		const fixedEventsResponse = await fetch('/fixedEvents.json');
 		fixedEvents = await fixedEventsResponse.json();
 
 		const situation = getRandomSituation();

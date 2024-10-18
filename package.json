@@ -4,22 +4,20 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "rollup -c",
-    "dev": "rollup -c -w",
-    "start": "sirv public --no-clear"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri dev",
+    "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
-    "@rollup/plugin-commonjs": "^24.0.0",
-    "@rollup/plugin-node-resolve": "^15.0.0",
-    "@rollup/plugin-terser": "^0.4.0",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "@tauri-apps/cli": "^2.0.3",
     "@tsconfig/svelte": "^5.0.4",
-    "rollup": "^3.15.0",
-    "rollup-plugin-css-only": "^4.3.0",
-    "rollup-plugin-livereload": "^2.0.0",
-    "rollup-plugin-svelte": "^7.1.2",
-    "svelte": "^3.55.0"
-  },
-  "dependencies": {
-    "sirv-cli": "^2.0.0"
+    "svelte": "^4.2.19",
+    "svelte-check": "^4.0.4",
+    "tslib": "^2.7.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.8"
   }
 }

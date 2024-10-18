@@ -1,0 +1,54 @@
+[
+    {
+        "interval": 20,
+        "description": "Экзамены",
+        "actions": [
+            {
+                "description": "Подготовить учеников",
+                "effects": {
+                    "administration": 1,
+                    "colleagues": 0,
+                    "parents": 1,
+                    "students": 2,
+                    "freeTime": -3
+                }
+            },
+            {
+                "description": "Не готовить",
+                "effects": {
+                    "administration": -2,
+                    "colleagues": 0,
+                    "parents": -2,
+                    "students": -2,
+                    "freeTime": 1
+                }
+            }
+        ]
+    },
+    {
+        "interval": 50,
+        "description": "Повышение квалификации",
+        "actions": [
+            {
+                "description": "Пройти курсы",
+                "effects": {
+                    "administration": 2,
+                    "colleagues": 1,
+                    "parents": 0,
+                    "students": 0,
+                    "freeTime": -3
+                }
+            },
+            {
+                "description": "Игнорировать",
+                "effects": {
+                    "administration": -2,
+                    "colleagues": -1,
+                    "parents": 0,
+                    "students": 0,
+                    "freeTime": 1
+                }
+            }
+        ]
+    }
+]
