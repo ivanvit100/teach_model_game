@@ -63,6 +63,16 @@
                 }
             },
             {
+                "description": "Репетиторство",
+                "effects": {
+                    "administration": -1,
+                    "colleagues": 0,
+                    "parents": 1,
+                    "students": 0,
+                    "freeTime": -1
+                }
+            },
+            {
                 "description": "Отказать",
                 "effects": {
                     "administration": 0,
