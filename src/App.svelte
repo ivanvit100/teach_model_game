@@ -144,7 +144,7 @@ onMount(async () => {
         {#each parameters as parameter}
         <div class="parameter">
             <div class="parameter-label">
-                <img src={`icons/${parameter.id}.png`} alt={parameter.label} class="icon"> {parameter.label}
+                <img src={`/icons/${parameter.id}.png`} alt={parameter.label} class="icon"> {parameter.label}
             </div>
             <div class="progress-bar">
                 <div class="progress" style="background-color: {parameter.color};" id={parameter.id}></div>
