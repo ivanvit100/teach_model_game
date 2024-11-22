@@ -87,7 +87,7 @@ h1 {
   justify-content: space-around;
   margin-top: 20px;
 }
-.actions button {
+.actions input[type="button"] {
   background-color: #007bff;
   color: #fff;
   border: none;
@@ -95,8 +95,13 @@ h1 {
   padding: 10px;
   cursor: pointer;
 }
-.actions button:hover {
+.actions input[type="button"]:hover {
   background-color: #0056b3;
+}
+.actions input[type="button"]:disabled {
+  background-color: #043162;
+  color: #163659;
+  cursor: not-allowed;
 }
 .status {
   margin-top: 20px;

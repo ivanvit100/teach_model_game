@@ -133,5 +133,55 @@
                 }
             }
         ]
+    },
+    {
+        "description": "Вам достался класс с очень разным уровнем учеников.",
+        "actions": [
+            {
+                "description": "Разделить на группы",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 0,
+                    "parents": 0,
+                    "students": 1,
+                    "freeTime": -1
+                }
+            },
+            {
+                "description": "Провести общее занятие",
+                "effects": {
+                    "administration": 0,
+                    "colleagues": 0,
+                    "parents": 0,
+                    "students": -1,
+                    "freeTime": 1
+                }
+            }
+        ]
+    },
+    {
+        "description": "Коллеги решили провести мероприятие, привлекли Вас, но сами в последний момент отказались.",
+        "actions": [
+            {
+                "description": "Провести самостоятельно",
+                "effects": {
+                    "administration": 1,
+                    "colleagues": 2,
+                    "parents": 0,
+                    "students": 0,
+                    "freeTime": -2
+                }
+            },
+            {
+                "description": "Отказать",
+                "effects": {
+                    "administration": -1,
+                    "colleagues": -1,
+                    "parents": 0,
+                    "students": 0,
+                    "freeTime": 1
+                }
+            }
+        ]
     }
 ]
