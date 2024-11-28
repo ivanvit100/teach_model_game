@@ -7,6 +7,7 @@
 
 import type { Situation, FixedEvent, Parameter, IUIManager, ISituationManager } from './types';
 import { writable } from 'svelte/store';
+import { invoke } from '@tauri-apps/api/core';
 
 /** Store для текущей ситуации в игре */
 export const currentSituation = writable<Situation | FixedEvent | null>(null);
@@ -96,35 +97,25 @@ class UI implements IUIManager {
  */
 class Situations implements ISituationManager {
     protected Page: Page;
-    public situations: Situation[] = [];
-    public fixedEvents: FixedEvent[] = [];
-    public situation: Situation | FixedEvent;
+    public situation: Situation | FixedEvent = {} as Situation | FixedEvent;
     public now: number = 0;
 
     constructor(Page: Page) {
         this.Page = Page;
-        this.getSituations();
-        this.situation = this.getRandomSituation();
+        this.getParameters();
+        this.getRandomSituation();
     }
 
     /**
      * Загружает данные игры из JSON файлов
      */
-    async getSituations(): Promise<void> {
+    async getParameters(): Promise<void> {
         try {
-            const [situationsResponse, fixedEventsResponse, parametersResponse] = await Promise.all([
-                fetch('/situations.json'),
-                fetch('/fixedEvents.json'),
-                fetch('/parameters.json')
-            ]);
-
-            this.situations = await situationsResponse.json();
-            this.fixedEvents = await fixedEventsResponse.json();
+            const [parametersResponse] = await Promise.all([fetch('/parameters.json')]);
             this.Page.parameters = await parametersResponse.json();
-
             this.Page.start();
         } catch (error) {
-            console.error('[Situations] | getSituations(): ', error);
+            console.error('[Situations] | getParameters(): ', error);
         }
     }
 
@@ -132,17 +123,14 @@ class Situations implements ISituationManager {
      * Возвращает случайную ситуацию
      * @returns {Situation} Случайная ситуация
      */
-    getRandomSituation(): Situation {
-        if (this.situations.length === 0) {
-            setTimeout(() => this.getRandomSituation(), 50);
-            return { description: 'Loading...', actions: [] };
+    async getRandomSituation(): Promise<Situation> {
+        try {
+            this.situation = await invoke('generate_question', { day: this.now });
+            return this.situation;
+        } catch (error) {
+            console.error('[Situations] | getRandomSituation(): ', error);
+            throw error;
         }
-
-        const index = Math.floor(Math.random() * this.situations.length);
-        if (index === this.now) return this.getRandomSituation();
-        
-        this.now = index;
-        return this.situations[index];
     }
 
     /**
@@ -180,11 +168,11 @@ export class Page {
     /**
      * Запускает игру
      */
-    start(): void {
+    async start(): Promise<void> {
         const situation = this.Situations.getRandomSituation();
         
-        requestAnimationFrame(() => {
-            this.UI.updateParameters(situation);
+        requestAnimationFrame(async () => {
+            this.UI.updateParameters(await situation);
         });
     }
     
@@ -192,7 +180,7 @@ export class Page {
      * Перезапускает игру (реакция на кнопку)
     */
    async restart(): Promise<void> {
-        await this.Situations.getSituations();
+        await this.Situations.getParameters();
         this.score = 0;
         this.Situations.now = 0;
         this.flag = true;

@@ -23,7 +23,7 @@ let page: Page;
 onMount(async () => {
     page = new Page();
 
-    handleAction = (action: Action): void => {
+    handleAction = async (action: Action): Promise<void> => {
         page.parameters.forEach(param => {
             param.value = Math.min(10, param.value + action.effects[param.id as keyof typeof action.effects]);
         });
@@ -31,10 +31,10 @@ onMount(async () => {
         if (page.checkEndGame()) return;
         page.UI.displayWarnings();
         page.score++;
-    
-        const fixedEvent = page.Situations.fixedEvents.find(event => page.score % event.interval === 0);
+        page.Situations.now++;
 
-        page.UI.updateParameters(fixedEvent ? fixedEvent : page.Situations.getRandomSituation());
+        const situation = await page.Situations.getRandomSituation();
+        page.UI.updateParameters(situation);
     }
 
 });

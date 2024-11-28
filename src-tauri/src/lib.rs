@@ -2,7 +2,6 @@ use std::sync::Mutex;
 use serde::{Serialize, Deserialize};
 use tauri::State;
 use rand::Rng;
-use phf::phf_map;
 
 #[derive(Deserialize, Serialize, Clone, Debug)]
 struct Effects {
@@ -86,12 +85,14 @@ impl AppState {
 
 #[tauri::command]
 async fn generate_question<'a>(day: usize, state: State<'_, AppState>) -> Result<Event, String> {
-    for fixed_event in &state.fixed_events {
-        if day % fixed_event.interval == 0 {
-            return Ok(Event {
-                description: fixed_event.description.clone(),
-                actions: fixed_event.actions.clone()
-            });
+    if day != 0 {
+        for fixed_event in &state.fixed_events {
+            if day % fixed_event.interval == 0 {
+                return Ok(Event {
+                    description: fixed_event.description.clone(),
+                    actions: fixed_event.actions.clone()
+                });
+            }
         }
     }
 

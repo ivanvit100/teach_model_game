@@ -84,21 +84,19 @@ export interface IUIManager {
  * @interface ISituationManager
  */
 export interface ISituationManager {
-    situations: Situation[];
-    fixedEvents: FixedEvent[];
     situation: Situation | FixedEvent;
     now: number;
 
     /**
      * Загружает ситуации из JSON файлов
      */
-    getSituations(): Promise<void>;
+    getParameters(): Promise<void>;
 
     /**
      * Возвращает случайную ситуацию
      * @returns {Situation} Случайная ситуация
      */
-    getRandomSituation(): Situation;
+    getRandomSituation(): Promise<Situation>;
 
     /**
      * Вычисляет общий счет игры
