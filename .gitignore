@@ -5,3 +5,4 @@ package-lock.js
 .DS_Store
 
 .cargo
+dist/
