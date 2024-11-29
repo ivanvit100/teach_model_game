@@ -54,5 +54,5 @@ Coming soon...
 ## Авторы
 - Frontend: [Иванущенко Виталий Александрович](https://ivanvit.ru)
 - Backend: [Миннахметов Алмаз Ильдарович](https://github.com/BlackRavenoo)
-- Game design:
+- Game design: [Королева Марина Вячеславовна](https://vk.com/lmao_yeah)
 - Методическое сопровождение: [Костин Андрей Викторович](https://kpfu.ru/main?p_id=38150)
