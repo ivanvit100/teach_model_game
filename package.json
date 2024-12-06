@@ -7,8 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "tauri": "tauri dev",
-    "tauri:build": "tauri build",
+    "tauri": "node ./node_modules/@tauri-apps/cli/tauri.js",
     "check": "svelte-check --tsconfig ./tsconfig.json && tsc -p tsconfig.node.json"
   },
   "devDependencies": {
