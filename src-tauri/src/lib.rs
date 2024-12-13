@@ -121,6 +121,7 @@ async fn generate_question<'a>(day: usize, state: State<'_, AppState>) -> Result
 #[tauri::command]
 async fn get_parameters(state: State<'_, AppState>) -> Result<Vec<Parameter>, String> {
     let parameters = state.get_parameters();
+    println!("{:?}", parameters);
 
     Ok(parameters)
 }

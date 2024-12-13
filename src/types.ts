@@ -4,6 +4,8 @@
  * @module types
  */
 
+import type { Page } from "./classes";
+
 /**
  * Действие, которое может совершить игрок
  * @typedef Action
@@ -60,7 +62,7 @@ export interface IUIManager {
      * @param {Situation | FixedEvent} st - Ситуация или фиксированное событие
      * @returns {Promise<void>} Промис, который разрешается после обновления параметров
      */
-    updateParameters(st: Situation | FixedEvent): Promise<void>;
+    updateParametersDisplay(st: Situation | FixedEvent): Promise<void>;
 
     /**
      * Отображает предупреждения при низких значениях параметров
@@ -80,27 +82,44 @@ export interface IUIManager {
 }
 
 /**
- * Интерфейс для управления игровыми ситуациями
- * @interface ISituationManager
+ * Интерфейс для управления запросами
+ * @interface IRequest
  */
-export interface ISituationManager {
-    situation: Situation | FixedEvent;
+export interface IRequest {
     now: number;
-
     /**
      * Загружает ситуации из JSON файлов
      */
     getParameters(): Promise<void>;
-
+    
     /**
      * Возвращает случайную ситуацию
      * @returns {Situation} Случайная ситуация
      */
     getRandomSituation(): Promise<Situation>;
+}
+
+/**
+ * Интерфейс для управления игровыми ситуациями
+ * @interface ISituationManager
+ */
+export interface ISituationManager {
+    situation: Situation | FixedEvent | null;
 
     /**
      * Вычисляет общий счет игры
      * @returns {number} Процент общего счета
      */
     calculateOverallScore(): number;
+
+    /**
+     * Возвращает текущую ситуацию
+     * @returns {Situation | FixedEvent} Текущая ситуация или фиксированное событи
+     */
+    getSituation(): Promise<Situation | FixedEvent>;
+
+    /**
+     * Перезапускает игру
+     */
+    restart(): Promise<void>;
 }

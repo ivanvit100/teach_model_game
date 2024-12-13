@@ -31,10 +31,9 @@ onMount(async () => {
         if (page.checkEndGame()) return;
         page.UI.displayWarnings();
         page.score++;
-        page.Situations.now++;
 
-        const situation = await page.Situations.getRandomSituation();
-        page.UI.updateParameters(situation);
+        const situation = await page.Situations.getSituation();
+        page.UI.updateParametersDisplay(situation);
     }
 
 });
@@ -63,7 +62,7 @@ $: situation = $currentSituation;
     {#key $currentSituation} 
         <div class="card">
             <div class="situation">
-                {$currentSituation?.description}
+                { $currentSituation?.description }
             </div>
         </div>
         <div class="actions">
@@ -73,7 +72,7 @@ $: situation = $currentSituation;
                         type="button" 
                         on:click={ () => handleAction(action) } 
                         disabled={ !page.flag } 
-                        value={ action.description} 
+                        value={ action.description } 
                     >
                 {/each}
             {/if}

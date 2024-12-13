@@ -5,7 +5,7 @@
  * Разработчик: ivanvit100 (ivanvit.ru)
  */
 
-import type { Situation, FixedEvent, Parameter, IUIManager, ISituationManager } from './types';
+import type { Situation, FixedEvent, Parameter, IUIManager, ISituationManager, IRequest } from './types';
 import { writable } from 'svelte/store';
 import { invoke } from '@tauri-apps/api/core';
 
@@ -30,7 +30,7 @@ class UI implements IUIManager {
      * Обновляет параметры и визуальное отображение
      * @param st - Текущая ситуация или фиксированное событие
      */
-    async updateParameters(st: Situation | FixedEvent): Promise<void> {
+    async updateParametersDisplay(st: Situation | FixedEvent): Promise<void> {
         currentSituation.set(st);
         this.Situations.situation = st;
         
@@ -91,59 +91,96 @@ class UI implements IUIManager {
 }
 
 /**
- * Класс управления ситуациями в игре
- * @class Situations
- * @implements {ISituationManager}
+ * Класс запросов к серверу
+ * @class Request
+ * @implements {IRequest}
  */
-class Situations implements ISituationManager {
-    protected Page: Page;
-    public situation: Situation | FixedEvent = {} as Situation | FixedEvent;
+class Request implements IRequest {
+    #page: Page;
     public now: number = 0;
 
-    constructor(Page: Page) {
-        this.Page = Page;
-        this.getParameters();
-        this.getRandomSituation();
+    constructor(page: Page) {
+        this.#page = page;
     }
 
     /**
-     * Загружает данные игры из JSON файлов
+     * Загружает параметры из JSON файлов посредством запроса к серверу
+     * @returns {Promise<void>}
+     * @throws {Error} Ошибка при запросе
      */
     async getParameters(): Promise<void> {
         try {
-            const [parametersResponse] = await Promise.all([fetch('/parameters.json')]);
-            this.Page.parameters = await parametersResponse.json();
-            this.Page.start();
+            this.#page.parameters = (await invoke('get_parameters', { day: this.now })) as Parameter[];
+            console.log(this.#page.parameters);
+            this.#page.start(); 
         } catch (error) {
-            console.error('[Situations] | getParameters(): ', error);
-        }
-    }
-
-    /**
-     * Возвращает случайную ситуацию
-     * @returns {Situation} Случайная ситуация
-     */
-    async getRandomSituation(): Promise<Situation> {
-        try {
-            this.situation = await invoke('generate_question', { day: this.now });
-            return this.situation;
-        } catch (error) {
-            console.error('[Situations] | getRandomSituation(): ', error);
+            console.error('[Request] | getParameters(): ', error);
             throw error;
         }
     }
 
     /**
-     * Рассчитывает общий счет игры
+     * Получает случайную ситуацию
+     * @returns {Promise<Situation>} Случайная ситуация
+     * @throws {Error} Ошибка при запросе
+     */
+    async getRandomSituation(): Promise<Situation> {
+        try {
+            const situation = (await invoke('generate_question', { day: this.now })) as Situation;
+            return situation;
+        } catch (error) {
+            console.error('[Request] | getRandomSituation(): ', error);
+            throw error;
+        }
+    }
+}
+
+/**
+ * Класс управления игровыми ситуациями
+ * @class Situations
+ * @implements {ISituationManager}
+ */
+class Situations implements ISituationManager {
+    #page: Page;
+    #request: IRequest;
+    public situation: Situation | FixedEvent | null = null;
+
+    constructor(page: Page) {
+        this.#page = page;
+        this.#request = new Request(page);
+    }
+    
+    /**
+     * Получает случайную ситуацию посредством обращения к Request
+     * @returns {Promise<Situation | FixedEvent>} Ситуация или фиксированное событие
+     */
+    async getSituation(): Promise<Situation | FixedEvent> {
+        this.#request.now++;
+        this.situation = await this.#request.getRandomSituation();
+        return this.situation!;
+    }
+    
+    /**
+     * Перезапускает игру
+     * @returns {Promise<void>}
+     */
+    async restart(): Promise<void> {
+        await this.#request.getParameters();
+        this.situation = null;
+        this.#request.now = 0;
+    }
+
+    /**
+     * Вычисляет общий счет игры
      * @returns {number} Процент общего счета
      */
     calculateOverallScore(): number {
         const maxScore = 50;
-        const currentScore = this.Page.parameters.reduce((sum, param) => sum + param.value, 0);
-        const hyperbolicScore = this.Page.parameters.reduce((sum, param) => sum + 1 / param.value, 0) * 10;
+        const currentScore = this.#page.parameters.reduce((sum, param) => sum + param.value, 0);
+        const hyperbolicScore = this.#page.parameters.reduce((sum, param) => sum + 1 / param.value, 0) * 10;
         const normalizedScore = (currentScore / maxScore) * 100;
         const penalty = Math.max(0, 100 - normalizedScore - hyperbolicScore);
-        
+
         return Math.min(100, normalizedScore - penalty);
     }
 }
@@ -169,23 +206,22 @@ export class Page {
      * Запускает игру
      */
     async start(): Promise<void> {
-        const situation = this.Situations.getRandomSituation();
+        const situation = this.Situations.getSituation();
         
         requestAnimationFrame(async () => {
-            this.UI.updateParameters(await situation);
+            this.UI.updateParametersDisplay(await situation);
         });
     }
     
     /**
      * Перезапускает игру (реакция на кнопку)
     */
-   async restart(): Promise<void> {
-        await this.Situations.getParameters();
+    async restart(): Promise<void> {
         this.score = 0;
-        this.Situations.now = 0;
+        await this.Situations.restart();
         this.flag = true;
         this.init = true;
-        this.start();
+        await this.start();
         this.UI.clearWarnings();
     }
 
@@ -196,7 +232,7 @@ export class Page {
     checkEndGame(): boolean {
         const endGameParam = this.parameters.find(param => param.value <= 0);
         if (endGameParam) {
-            this.UI.updateParameters(this.Situations.situation!);
+            this.UI.updateParametersDisplay(this.Situations.situation!);
             this.UI.displayEndGameMessage(endGameParam.message);
             this.init = false;
             return true;
