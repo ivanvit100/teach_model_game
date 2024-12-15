@@ -39,11 +39,6 @@ class UI implements IUIManager {
             const element = document.getElementById(param.id);
             if (element) element.style.height = `${param.value * 10}%`;
         });
-    
-        // Обновление общего прогресс-бара
-        const overall = this.Situations.calculateOverallScore();
-        const overallBar = document.getElementById('overall-bar');
-        if (overallBar) overallBar.style.width = `${overall}%`;
     }
 
     /**
@@ -133,6 +128,28 @@ class Request implements IRequest {
             throw error;
         }
     }
+
+    /**
+     * Возвращает язык интерфейса
+     * @returns {Promise<string>} Язык интерфейса
+     * @throws {Error} Ошибка при запросе
+     * @todo Реализовать получение языка
+     */
+    async getLanguage(): Promise<string> {
+        let lang: string = 'ru-RU';
+        return `langs/${lang}.webp`;
+    }
+
+    /**
+     * Устанавливает язык интерфейса
+     * @param {string} lang - Язык интерфейса
+     * @returns {Promise<void>}
+     * @throws {Error} Ошибка при запросе
+     * @todo Реализовать установку языка
+     */
+    async setLanguage(lang: string): Promise<void> {
+        console.log(`[Request] | setLanguage(${lang})`);
+    }
 }
 
 /**
@@ -142,12 +159,10 @@ class Request implements IRequest {
  */
 class Situations implements ISituationManager {
     #page: Page;
-    #request: IRequest;
     public situation: Situation | FixedEvent | null = null;
 
     constructor(page: Page) {
         this.#page = page;
-        this.#request = new Request(page);
     }
     
     /**
@@ -155,8 +170,8 @@ class Situations implements ISituationManager {
      * @returns {Promise<Situation | FixedEvent>} Ситуация или фиксированное событие
      */
     async getSituation(): Promise<Situation | FixedEvent> {
-        this.#request.now++;
-        this.situation = await this.#request.getRandomSituation();
+        this.#page.Request.now++;
+        this.situation = await this.#page.Request.getRandomSituation();
         return this.situation!;
     }
     
@@ -165,23 +180,9 @@ class Situations implements ISituationManager {
      * @returns {Promise<void>}
      */
     async restart(): Promise<void> {
-        await this.#request.getParameters();
+        await this.#page.Request.getParameters();
         this.situation = null;
-        this.#request.now = 0;
-    }
-
-    /**
-     * Вычисляет общий счет игры
-     * @returns {number} Процент общего счета
-     */
-    calculateOverallScore(): number {
-        const maxScore = 50;
-        const currentScore = this.#page.parameters.reduce((sum, param) => sum + param.value, 0);
-        const hyperbolicScore = this.#page.parameters.reduce((sum, param) => sum + 1 / param.value, 0) * 10;
-        const normalizedScore = (currentScore / maxScore) * 100;
-        const penalty = Math.max(0, 100 - normalizedScore - hyperbolicScore);
-
-        return Math.min(100, normalizedScore - penalty);
+        this.#page.Request.now = 0;
     }
 }
 
@@ -190,15 +191,27 @@ class Situations implements ISituationManager {
  * @class Page
  */
 export class Page {
-    public UI: IUIManager;
-    public Situations: ISituationManager;
+    public UI!: IUIManager;
+    public Request!: IRequest;
+    public Situations!: ISituationManager;
     public score: number = 0;
     public flag: boolean = true;
     public parameters: Parameter[] = [];
     public init: boolean = false;
+    public lang: string = '/langs/en-US.webp';
 
     constructor() {
+        this.initialize();
+    }
+    
+    /**
+     * Инициализация классов
+     * @returns {Promise<void>}
+     */
+    private async initialize(): Promise<void> {
         this.Situations = new Situations(this);
+        this.Request = new Request(this);
+        this.lang = await this.Request.getLanguage();
         this.UI = new UI(this, this.Situations as Situations);
     }
 
@@ -207,7 +220,6 @@ export class Page {
      */
     async start(): Promise<void> {
         const situation = this.Situations.getSituation();
-        
         requestAnimationFrame(async () => {
             this.UI.updateParametersDisplay(await situation);
         });

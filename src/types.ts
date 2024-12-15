@@ -97,6 +97,18 @@ export interface IRequest {
      * @returns {Situation} Случайная ситуация
      */
     getRandomSituation(): Promise<Situation>;
+
+    /**
+     * Возвращает выбранный пользователем язык интерфейса
+     * @returns {string} Язык интерфейса
+     */
+    getLanguage(): Promise<string>;
+
+    /**
+     * Устанавливает язык интерфейса
+     * @param {string} lang - Язык интерфейса
+     */
+    setLanguage(lang: string): Promise<void>;
 }
 
 /**
@@ -105,13 +117,6 @@ export interface IRequest {
  */
 export interface ISituationManager {
     situation: Situation | FixedEvent | null;
-
-    /**
-     * Вычисляет общий счет игры
-     * @returns {number} Процент общего счета
-     */
-    calculateOverallScore(): number;
-
     /**
      * Возвращает текущую ситуацию
      * @returns {Situation | FixedEvent} Текущая ситуация или фиксированное событи

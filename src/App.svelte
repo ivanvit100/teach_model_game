@@ -44,57 +44,57 @@ $: situation = $currentSituation;
 
 <div id="app">
     <header>
-        <h1>Teacher Life Game</h1>
+        <h1>Teacher Life</h1>
     </header>
     {#if page && page.init}
+    <div class="container">
+        {#key $currentSituation} 
+            <div class="card">
+                <div class="situation">
+                    { $currentSituation?.description }
+                </div>
+            </div>
+            <div class="actions">
+                {#if $currentSituation}
+                    {#each $currentSituation.actions as action}
+                        <input 
+                            type="button" 
+                            on:click={ () => handleAction(action) } 
+                            disabled={ !page.flag } 
+                            value={ action.description } 
+                        >
+                    {/each}
+                {/if}
+            </div>
+        {/key}
+    </div>
+    <div class="status">
+        <div id="score">{ page.score }</div>
+    </div>
     <div class="parameters">
         {#each page.parameters as parameter}
         <div class="parameter">
-            <div class="parameter-label">
-                <img src={`icons/${ parameter.id }.png`} alt={ parameter.label } class="icon"> { parameter.label }
-            </div>
             <div class="progress-bar">
                 <div class="progress" style="background-color: { parameter.color };" id={ parameter.id }></div>
+            </div>
+            <div class="parameter-label">
+                <img src={`icons/${ parameter.id }.png`} alt={ parameter.label } class="icon"> { parameter.label }
             </div>
         </div>
         {/each}
     </div>
-    {#key $currentSituation} 
-        <div class="card">
-            <div class="situation">
-                { $currentSituation?.description }
-            </div>
-        </div>
-        <div class="actions">
-            {#if $currentSituation}
-                {#each $currentSituation.actions as action}
-                    <input 
-                        type="button" 
-                        on:click={ () => handleAction(action) } 
-                        disabled={ !page.flag } 
-                        value={ action.description } 
-                    >
-                {/each}
-            {/if}
-        </div>
-    {/key}
-    <div class="status">
-        <div id="score">Счет: { page.score }</div>
-    </div>
     {:else if page}
-    <div class="start">
+    <div class="start_container">
         <input
             type="button"
             on:click={ () => page.restart() }
-            value="Начать игру"
         >
     </div>
+    <img src="{ page.lang }" alt="language switch" class="lang link">
+    <button class="github link" on:click={ () => location.href="https://github.com/ivanvit100/teach_model_game" }>
+        <img src="github.webp" alt="GitHub"> 
+    </button>
+    <img src="info.webp" alt="info" class="info link">
     {/if}
     <div id="warnings" class="warnings"></div>
-    <div class="overall-container">
-        <div class="overall-label">Общая оценка</div>
-        <div class="overall-bar">
-            <div class="overall-progress" id="overall-bar"></div>
-        </div>
-    </div>
 </div>
