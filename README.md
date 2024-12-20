@@ -56,3 +56,4 @@ Coming soon...
 - Backend: [Миннахметов Алмаз Ильдарович](https://github.com/BlackRavenoo)
 - Game design: [Королева Марина Вячеславовна](https://vk.com/lmao_yeah)
 - Методическое сопровождение: [Костин Андрей Викторович](https://kpfu.ru/main?p_id=38150)
+- Методическое сопровождение: [Костина Наталья Николаевна](https://kpfu.ru/natalya.kostina)
