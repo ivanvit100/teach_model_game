@@ -78,6 +78,18 @@ jobs:
       - name: install frontend dependencies
         run: npm install
 
+      # Установка rollup для Windows
+      - name: Install Windows rollup module
+        if: matrix.platform == 'windows-latest'
+        run: npm install @rollup/rollup-win32-x64-msvc --no-save
+
+      # Установка нативной версии rollup для macOS
+      - name: Install macOS rollup modules
+        if: matrix.platform == 'macos-latest'
+        run: |
+          npm install @rollup/rollup-darwin-arm64 --no-save
+          npm install @rollup/rollup-darwin-x64 --no-save
+
       - name: install tauri
         run: cargo install tauri-cli
 
