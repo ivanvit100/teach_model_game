@@ -48,8 +48,10 @@ jobs:
         include:
           - platform: "macos-latest"
             args: "--target aarch64-apple-darwin"
+            arch: "arm64"
           - platform: "macos-latest"
             args: "--target x86_64-apple-darwin"
+            arch: "x64"
           - platform: "ubuntu-22.04"
             args: ""
           - platform: "windows-latest"
@@ -75,20 +77,32 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
+      # Установка основных зависимостей
       - name: install frontend dependencies
         run: npm install
+
+      # Пропустить использование нативного rollup для всех платформ
+      - name: Configure rollup to skip native modules
+        run: echo "ROLLUP_SKIP_NODEJS=true" >> $GITHUB_ENV
+        shell: bash
 
       # Установка rollup для Windows
       - name: Install Windows rollup module
         if: matrix.platform == 'windows-latest'
-        run: npm install @rollup/rollup-win32-x64-msvc --no-save
+        run: |
+          npm install @rollup/rollup-win32-x64-msvc --no-save
+          npm list @rollup/rollup-win32-x64-msvc
 
-      # Установка нативной версии rollup для macOS
-      - name: Install macOS rollup modules
+      # Установка rollup для macOS с учетом архитектуры
+      - name: Install macOS rollup module
         if: matrix.platform == 'macos-latest'
         run: |
-          npm install @rollup/rollup-darwin-arm64 --no-save
-          npm install @rollup/rollup-darwin-x64 --no-save
+          if [[ "${{ matrix.arch }}" == "arm64" ]]; then
+            npm install @rollup/rollup-darwin-arm64 --no-save
+          else
+            npm install @rollup/rollup-darwin-x64 --no-save
+          fi
+        shell: bash
 
       - name: install tauri
         run: cargo install tauri-cli
