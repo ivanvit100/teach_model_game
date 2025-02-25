@@ -85,9 +85,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
-      # Установка npm зависимостей с флагом игнорирования ошибок
+      # Установка esbuild для Windows
+      - name: Install esbuild for Windows
+        if: matrix.platform == 'windows-latest'
+        run: |
+          npm install @esbuild/win32-x64 --no-save
+        shell: cmd
+
+      # Установка npm зависимостей
       - name: install frontend dependencies
-        run: npm install --ignore-scripts || true
+        run: npm install --no-optional=false --omit=dev
         
       # Пропустить использование нативного sharp
       - name: Skip sharp installation
@@ -124,39 +131,32 @@ jobs:
       - name: install tauri
         run: cargo install tauri-cli
 
-      # Создаем временную конфигурацию без подписи
-      - name: Prepare tauri config without signing
+      # Выключаем механизм подписи в Tauri
+      - name: Disable signing for Tauri
         run: |
-          # Проверяем, что файл существует
-          if [ -f "src-tauri/tauri.conf.json" ]; then
-            CONFIG_PATH="src-tauri/tauri.conf.json"
-          else
-            CONFIG_PATH="tauri.conf.json"
-          fi
-          
-          # Создаем копию без настроек подписи
-          cat $CONFIG_PATH | jq 'del(.tauri.bundle.macOS.signing) | del(.tauri.bundle.windows.certificateThumbprint) | del(.tauri.bundle.windows.timestampUrl)' > temp_tauri_config.json
-          
-          echo "Созданный конфиг без подписи:"
-          cat temp_tauri_config.json
+          echo "TAURI_KEY_PASSWORD=dummy" >> $GITHUB_ENV
+          echo "TAURI_PRIVATE_KEY=dummy" >> $GITHUB_ENV
+          echo "TAURI_SIGNING_PRIVATE_KEY=dummy" >> $GITHUB_ENV
+          echo "TAURI_SIGNING_PRIVATE_KEY_PASSWORD=dummy" >> $GITHUB_ENV
+          echo "TAURI_SKIP_UPDATER_SIGNATURE=1" >> $GITHUB_ENV
         shell: bash
 
-      # Сборка без подписи со всеми необходимыми переменными окружения
+      # Сборка без конфигурационного файла
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Явно указываем, что нужно пропустить подпись
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: "SKIP"
-          TAURI_SIGNING_PRIVATE_KEY: ""
+          # Явно указываем флаги для пропуска подписи
+          TAURI_SKIP_UPDATER_SIGNATURE: 1
+          TAURI_PRIVATE_KEY: dummy
+          TAURI_KEY_PASSWORD: dummy
         with:
           releaseId: ${{ needs.create-release.outputs.release_id }}
           tauriScript: cargo tauri
-          # Для всех платформ используем модифицированный конфиг и отключаем подпись
-          args: ${{ matrix.args }} --config temp_tauri_config.json
-          # Явно указываем пустой ключ подписи
+          args: ${{ matrix.args }} build --ci
+          # Указываем пустой ключ
           signingPrivateKeyBase64: ""
-          # Дополнительное уточнение для action
-          skipBeforeScript: true
+          # Пропускаем проверки перед сборкой
+          skipBeforeScript: false
 
   publish-release:
     permissions:
